@@ -839,6 +839,7 @@ stages:
       - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.isNightly}}))
     variables:
+      publicRelease: $[ stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'] ]
       nugetPackageVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       versionMajor: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
       prerelease: $[ stageDependencies.Build.A.outputs['build.NBGV_PrereleaseVersionNoLeadingHyphen'] ]
@@ -857,7 +858,7 @@ stages:
           - pwsh: |
               $directory = "$(Build.ArtifactStagingDirectory)/release-metadata"
               New-Item -ItemType Directory -Path $directory -Force | Out-Null
-              $kind = if ($env:IS_NIGHTLY -eq 'True') { 'nightly' } else { 'public' }
+              $kind = if ($env:IS_NIGHTLY -eq 'True') { 'nightly' } elseif ($env:PUBLIC_RELEASE -eq 'True') { 'public' } else { throw 'The run is neither a nightly nor a public release.' }
               [ordered]@{
                 kind         = $kind
                 version      = $env:NUGET_PACKAGE_VERSION
@@ -868,6 +869,7 @@ stages:
             displayName: Write release metadata
             env:
               IS_NIGHTLY: ${{ parameters.isNightly }}
+              PUBLIC_RELEASE: $(publicRelease)
               NUGET_PACKAGE_VERSION: $(nugetPackageVersion)
               VERSION_MAJOR: $(versionMajor)
               PRERELEASE: $(prerelease)
