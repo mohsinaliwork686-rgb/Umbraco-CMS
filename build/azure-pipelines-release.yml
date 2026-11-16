@@ -78,9 +78,9 @@ stages:
 
               Write-Host "Version $version ($kind release), npm dist-tag $npmDistTag, dry run $dryRun"
 
-              $buildNumber = if ($dryRun) { "$version - dry run" } else { $version }
-              Write-Host "##vso[build.updatebuildnumber]$buildNumber"
+              Write-Host "##vso[build.updatebuildnumber]$version"
               if ($kind -eq 'nightly') { Write-Host "##vso[build.addbuildtag]nightly" }
+              if ($dryRun) { Write-Host "##vso[build.addbuildtag]dry-run" }
 
               Write-Host "##vso[task.setvariable variable=kind;isOutput=true]$kind"
               Write-Host "##vso[task.setvariable variable=npmDistTag;isOutput=true]$npmDistTag"
