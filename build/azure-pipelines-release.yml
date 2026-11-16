@@ -10,9 +10,11 @@ resources:
       trigger:
         branches:
           include:
-            # Only branches and tags of this repository. Pull request runs, forks included, are refs/pull/* and never match.
-            - refs/heads/*
-            - refs/tags/*
+            # Only these refs start a release by themselves. Other branches, tags and pull request runs (refs/pull/*) never match.
+            - refs/heads/release/*
+            - refs/tags/release-*
+            - refs/heads/main
+            - refs/heads/v*/dev
         tags:
           - release
 
