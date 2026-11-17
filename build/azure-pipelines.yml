@@ -837,7 +837,18 @@ stages:
       - Unit
       - Integration
       - E2E
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.isNightly}}))
+      - Build_Docs
+      - Dependency_Track
+    condition: |
+      and(
+        eq(dependencies.Build.result, 'Succeeded'),
+        eq(dependencies.Unit.result, 'Succeeded'),
+        eq(dependencies.Integration.result, 'Succeeded'),
+        eq(dependencies.E2E.result, 'Succeeded'),
+        in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped'),
+        in(dependencies.Dependency_Track.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped'),
+        or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.isNightly}})
+      )
     variables:
       publicRelease: $[ stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'] ]
       nugetPackageVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
